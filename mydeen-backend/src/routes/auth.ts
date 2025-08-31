@@ -1,4 +1,5 @@
 import { Router } from "express";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import User from "../models/User";
 
@@ -31,7 +32,9 @@ router.post("/login", async (req, res) => {
   if (!user) return res.status(401).json({ message: "Invalid credentials" });
   const ok = await bcrypt.compare(password, user.passwordHash);
   if (!ok) return res.status(401).json({ message: "Invalid credentials" });
-  return res.json({ id: String(user._id), code: user.userCode, name: user.name, email: user.email });
+  // Генерируем JWT токен
+  const token = jwt.sign({ id: String(user._id), email: user.email }, process.env.JWT_SECRET || "mysecret", { expiresIn: "7d" });
+  return res.json({ id: String(user._id), code: user.userCode, name: user.name, email: user.email, token });
 });
 
 export default router;

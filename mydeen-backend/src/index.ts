@@ -1,10 +1,17 @@
+import 'dotenv/config';
 import express from "express";
 import cors from "cors";
-import { connectDB } from "./db";
+import { connectDB } from "./datab";
 import authRouter from "./routes/auth";
 import homeRouter from "./routes/home";
 import videosRouter from "./routes/videos";
 import articlesRouter from "./routes/articles";
+import quranRoutes from './quran/routes/quran';
+
+console.log('QF_ENV=', process.env.QF_ENV);
+console.log('QF_CLIENT_ID set=', !!process.env.QF_CLIENT_ID);
+console.log('QF_CLIENT_SECRET set=', !!process.env.QF_CLIENT_SECRET);
+
 
 const app = express();
 app.use(cors({ origin: true }));
@@ -17,6 +24,8 @@ app.use("/api", authRouter);
 app.use("/api/home", homeRouter);
 app.use("/api/videos", videosRouter);
 app.use("/api/articles", articlesRouter);
+// Все API из quran доступны по /api/quran
+app.use('/api/quran', quranRoutes);
 
 // 404 JSON fallback (важно для мобильного клиента, чтобы не получать HTML)
 app.use((req, res, next) => {
